@@ -1,16 +1,37 @@
-# macos_sample_app
+# Flutter Desktop Sample App
 
-A new Flutter project.
+A Flutter project demonstrating a simple desktop application with dummy Wallet Creation and Restoration flows. It supports macOS, Windows, and Linux.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project is configured to run on desktop platforms.
 
-A few resources to get you started if this is your first Flutter project:
+### Prerequisites
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Ensure you have the Flutter SDK installed and configured for your specific OS. [Install Flutter](https://docs.flutter.dev/get-started/install).
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### How to Run
+
+1.  Clone the repository or navigate to the project directory in your terminal:
+    ```bash
+    cd path/to/macos_sample_app
+    ```
+2.  Fetch the dependencies:
+    ```bash
+    flutter pub get
+    ```
+3.  Run the application for your specific desktop target:
+    
+    **macOS**:
+    ```bash
+    flutter run -d macos
+    ```
+    **Windows**:
+    ```bash
+    flutter run -d windows
+    ```
+    **Linux**:
+    ```bash
+    flutter run -d linux
+    ```
+
