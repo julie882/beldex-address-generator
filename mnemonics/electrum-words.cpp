@@ -45,6 +45,7 @@
 #include "electrum-words.h"
 #include "common/beldex.h"
 #include <boost/crc.hpp>
+#include <iostream>
 
 #include "chinese_simplified.h"
 #include "english.h"
@@ -90,19 +91,8 @@ namespace
   {
     // If there's a new language added, add an instance of it here.
     std::vector<Language::Base*> language_instances({
-      Language::Singleton<Language::Chinese_Simplified>::instance(),
-      Language::Singleton<Language::English>::instance(),
-      Language::Singleton<Language::Dutch>::instance(),
-      Language::Singleton<Language::French>::instance(),
-      Language::Singleton<Language::Spanish>::instance(),
-      Language::Singleton<Language::German>::instance(),
-      Language::Singleton<Language::Italian>::instance(),
-      Language::Singleton<Language::Portuguese>::instance(),
-      Language::Singleton<Language::Japanese>::instance(),
-      Language::Singleton<Language::Russian>::instance(),
-      Language::Singleton<Language::Esperanto>::instance(),
-      Language::Singleton<Language::Lojban>::instance(),
-      Language::Singleton<Language::EnglishOld>::instance()
+      Language::Singleton<Language::English>::instance()
+      
     });
     Language::Base *fallback = NULL;
 
@@ -157,7 +147,7 @@ namespace
       if (full_match)
       {
         *language = *it1;
-        MINFO("Full match for language " << (*language)->get_english_language_name());
+        std::cout<<"Full match for language " << (*language)->get_english_language_name()<<std::endl;
         return true;
       }
       // Some didn't match. Clear the index array.
@@ -171,11 +161,11 @@ namespace
     if (fallback)
     {
       *language = fallback;
-      MINFO("Fallback match for language " << (*language)->get_english_language_name());
+      std::cout<<"Fallback match for language " << (*language)->get_english_language_name()<<std::endl;
       return true;
     }
 
-    MINFO("No match found");
+    std::cout<<"No match found"<<std::endl;
     memwipe(matched_indices.data(), matched_indices.size() * sizeof(matched_indices[0]));
     return false;
   }
@@ -231,7 +221,7 @@ namespace
     epee::wipeable_string trimmed_last_word = last_word.length() > unique_prefix_length ? Language::utf8prefix(last_word, unique_prefix_length) :
       last_word;
     bool ret = Language::WordEqual()(trimmed_checksum, trimmed_last_word);
-    MINFO("Checksum is " << (ret ? "valid" : "invalid"));
+    std::cout<<"Checksum is " << (ret ? "valid" : "invalid")<<std::endl;
     return ret;
   }
 }
@@ -268,7 +258,7 @@ namespace crypto
 
       if (len % 4)
       {
-        MERROR("Invalid seed: not a multiple of 4");
+        std::cout<<"Invalid seed: not a multiple of 4"<<std::endl;
         return false;
       }
 
@@ -280,7 +270,7 @@ namespace crypto
         if (seed.size() != expected/2 && seed.size() != expected &&
           seed.size() != expected + 1)
         {
-          MERROR("Invalid seed: unexpected number of words");
+          std::cout<<"Invalid seed: unexpected number of words"<<std::endl;
           return false;
         }
 
@@ -293,7 +283,7 @@ namespace crypto
       Language::Base *language;
       if (!find_seed_language(seed, has_checksum, matched_indices, &language))
       {
-        MERROR("Invalid seed: language not found");
+        std::cout<<"Invalid seed: language not found"<<std::endl;
         return false;
       }
       language_name = language->get_language_name();
@@ -304,7 +294,7 @@ namespace crypto
         if (!checksum_test(seed, language))
         {
           // Checksum fail
-          MERROR("Invalid seed: invalid checksum");
+          std::cout<<"Invalid seed: invalid checksum"<<std::endl;
           return false;
         }
         seed.pop_back();
@@ -323,7 +313,7 @@ namespace crypto
         if (!(w[0]% word_list_length == w[1]))
         {
           memwipe(w, sizeof(w));
-          MERROR("Invalid seed: mumble mumble");
+          std::cout<<"Invalid seed: mumble mumble"<<std::endl;
           return false;
         }
 
@@ -357,12 +347,12 @@ namespace crypto
       epee::wipeable_string s;
       if (!words_to_bytes(words, s, sizeof(dst), true, language_name))
       {
-        MERROR("Invalid seed: failed to convert words to bytes");
+        std::cout<<"Invalid seed: failed to convert words to bytes"<<std::endl;
         return false;
       }
       if (s.size() != sizeof(dst))
       {
-        MERROR("Invalid seed: wrong output size");
+        std::cout<<"Invalid seed: wrong output size"<<std::endl;
         return false;
       }
       dst = *(const crypto::secret_key*)s.data();
@@ -435,18 +425,7 @@ namespace crypto
     std::vector<const Language::Base*> get_language_list()
     {
       static const std::vector<const Language::Base*> language_instances({
-        Language::Singleton<Language::German>::instance(),
-        Language::Singleton<Language::English>::instance(),
-        Language::Singleton<Language::Spanish>::instance(),
-        Language::Singleton<Language::French>::instance(),
-        Language::Singleton<Language::Italian>::instance(),
-        Language::Singleton<Language::Dutch>::instance(),
-        Language::Singleton<Language::Portuguese>::instance(),
-        Language::Singleton<Language::Russian>::instance(),
-        Language::Singleton<Language::Japanese>::instance(),
-        Language::Singleton<Language::Chinese_Simplified>::instance(),
-        Language::Singleton<Language::Esperanto>::instance(),
-        Language::Singleton<Language::Lojban>::instance()
+        Language::Singleton<Language::English>::instance()
       });
       return language_instances;
     }

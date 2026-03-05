@@ -1,2 +1,4 @@
 build
 serialization
+android-ndk-*
+boost_*

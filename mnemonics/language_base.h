@@ -38,7 +38,8 @@
 #include <vector>
 #include <unordered_map>
 #include <string>
-#include "epee/misc_log_ex.h"
+#include <iostream>
+//#include "epee/misc_log_ex.h"
 
 /*!
  * \namespace Language
@@ -192,7 +193,7 @@ namespace Language
         if ((*it).size() < unique_prefix_length)
         {
           if (flags & ALLOW_SHORT_WORDS)
-            MWARNING(language_name << " word '" << *it << "' is shorter than its prefix length, " << unique_prefix_length);
+            std::cout<<language_name << " word '" << *it << "' is shorter than its prefix length, " << unique_prefix_length<<std::endl;
           else
             throw std::runtime_error("Too short word in " + language_name + " word list: " + *it);
         }
@@ -208,7 +209,7 @@ namespace Language
         if (trimmed_word_map.find(trimmed) != trimmed_word_map.end())
         {
           if (flags & ALLOW_DUPLICATE_PREFIXES)
-            MWARNING("Duplicate prefix in " << language_name << " word list: " << std::string(trimmed.data(), trimmed.size()));
+            std::cout<<"Duplicate prefix in " << language_name << " word list: " << std::string(trimmed.data(), trimmed.size())<<std::endl;
           else
             throw std::runtime_error("Duplicate prefix in " + language_name + " word list: " + std::string(trimmed.data(), trimmed.size()));
         }

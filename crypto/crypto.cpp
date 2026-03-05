@@ -1,6 +1,9 @@
 #include <iostream>
-#include <mutex>
-#include <unistd.h>
+#ifdef _WIN32
+// Windows does not use unistd.h
+#else
+// #include <unistd.h>
+#endif
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
@@ -8,6 +11,7 @@
 #include <cstdio>
 #include <memory>
 #include <stdexcept>
+#include <mutex>
 
 #include "crypto.h"
 
@@ -31,6 +35,7 @@ namespace crypto
   extern "C"
   {
     #include "crypto-ops.h"
+    #include <mutex>
     #include "random.h"
   }
 
@@ -80,7 +85,8 @@ namespace crypto
 
   void random_scalar(unsigned char *bytes)
   {
-    std::lock_guard lock{random_mutex};
+    //std::lock_guard lock{random_mutex};
+    std::lock_guard<std::mutex> lock(random_mutex);
     do
     {
       generate_random_bytes_not_thread_safe(32, bytes);

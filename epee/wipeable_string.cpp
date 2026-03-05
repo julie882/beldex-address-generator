@@ -35,6 +35,7 @@
 #include <utility>
 #include <vector>
 #include <cstring>
+#include <stdexcept>
 #include "memwipe.h"
 #include "wipeable_string.h"
 

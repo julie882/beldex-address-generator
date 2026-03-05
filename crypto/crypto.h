@@ -4,6 +4,7 @@
 #include "epee/wipeable_string.h"
 #include "epee/span.h"
 #include "epee/hex.h"
+#include <cstring>
 
 namespace crypto {
 
