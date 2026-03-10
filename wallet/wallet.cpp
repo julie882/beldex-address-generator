@@ -59,6 +59,15 @@ wallet restore_wallet(const std::string& input_seed)
 
     w.address = cryptonote::get_account_address_as_str(
                     adr);
+
+    std::stringstream ss(std::string(input_seed.data(), input_seed.size()));
+    std::string word;
+
+    while (ss >> word)
+    {
+        w.seed.push_back(word);
+    }
+
     return w;
 }
 

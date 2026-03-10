@@ -31,25 +31,16 @@ int main(int argc, char* argv[]) {
         std::cout << "Restoring wallet from seed...\n";
         //epee::wipeable_string wipeable_seed(input);
         w = restore_wallet(input);
-        
-        //Asign seed into the struct object
-        std::stringstream ss(std::string(input.data(), input.size()));
-        std::string word;
-
-        while (ss >> word)
-        {
-            w.seed.push_back(word);
-        }
-       }
+    }
 
     std::cout <<" Mnemonic Seed: " << std::endl; 
-        for(const auto& word : w.seed)
-        {
-            std::cout<< word <<" ";
-        }
-        std::cout<<std::endl;
-        std::string address = w.address;
-        std::cout << "Wallet Address: " << address << std::endl;       
+    for(const auto& word : w.seed)
+    {
+        std::cout<< word <<" ";
+    }
+    std::cout<<std::endl;
+    std::string address = w.address;
+    std::cout << "Wallet Address: " << address << std::endl;       
     
 }
 

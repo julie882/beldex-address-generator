@@ -23,4 +23,4 @@ target_include_directories(mnemonics PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-#target_link_libraries(mnemonics PRIVATE epee common)
+target_link_libraries(mnemonics PRIVATE epee common)
