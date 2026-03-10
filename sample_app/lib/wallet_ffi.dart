@@ -94,7 +94,7 @@ class WalletFfi {
 
     final String resultString = resultPtr.toDartString();
 
-    print('resultString: $resultString');
+    // print('resultString: $resultString');
     
     // Free the C string memory to avoid leaks
     _freeString(resultPtr);

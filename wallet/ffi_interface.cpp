@@ -51,6 +51,12 @@ FFI_EXPORT char* ffi_restore_wallet(const char* input_seed)
 {
     wallet w = restore_wallet(input_seed);
 
+    if(w.address.empty() || w.seed.empty() || w.spend_pub.empty() || w.view_pub.empty() || w.private_spend_key.empty() || w.private_view_key.empty())
+    {
+        std::cout<<"Invalid wallet: address/seed/keys are empty"<<std::endl;
+        return nullptr;
+    }
+
     // Combine all the wallet data into a single string
     // Address
     std::string combined = w.address;
@@ -76,7 +82,7 @@ FFI_EXPORT char* ffi_restore_wallet(const char* input_seed)
     combined += ":::";
     combined += w.private_view_key;
 
-    std::cout << "combined: " << combined << std::endl;
+    // std::cout << "combined: " << combined << std::endl;
     char* result = (char*)malloc(combined.size() + 1);
     std::strcpy(result, combined.c_str());
 

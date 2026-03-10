@@ -136,23 +136,7 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
                   icon: Icons.badge_outlined,
                 ),
                 const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildLabel('Seed Phrase (25 words)'),
-                    GestureDetector(
-                      onTap: () =>
-                          setState(() => _obscureSeeds = !_obscureSeeds),
-                      child: Icon(
-                        _obscureSeeds
-                            ? Icons.visibility_outlined
-                            : Icons.visibility_off_outlined,
-                        color: const Color(0xFF00E5FF),
-                        size: 20,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildLabel('Seed Phrase (25 words)'),
                 const SizedBox(height: 10),
                 _buildSeedsField(),
                 const SizedBox(height: 8),

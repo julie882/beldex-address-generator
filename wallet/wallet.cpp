@@ -43,7 +43,12 @@ wallet restore_wallet(const std::string& input_seed)
     wallet w;
     crypto::secret_key seed_key;
     std::string language;
-    crypto::ElectrumWords::words_to_bytes(input_seed, seed_key, language);
+
+    if(!crypto::ElectrumWords::words_to_bytes(input_seed, seed_key, language))
+    {
+        std::cout<<"Invalid seed: failed to convert words to bytes"<<std::endl;
+        return w;
+    }
     account_keys keys = generate(seed_key, true, false);
     cryptonote::account_public_address adr;
 
