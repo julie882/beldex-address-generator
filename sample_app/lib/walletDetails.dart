@@ -5,12 +5,20 @@ class WalletDetailsPage extends StatelessWidget {
   final String name;
   final String address;
   final String seeds;
+  final String spend_pub;
+  final String view_pub;
+  final String private_spend_key;
+  final String private_view_key;
 
   const WalletDetailsPage({
     super.key,
     required this.name,
     required this.address,
     required this.seeds,
+    required this.spend_pub,
+    required this.view_pub,
+    required this.private_spend_key,
+    required this.private_view_key,
   });
 
   void _copyToClipboard(BuildContext context, String text, String label) {
@@ -122,7 +130,40 @@ class WalletDetailsPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              _buildBackupWarning(),
+              // Keys section
+              _buildSectionLabel('Keys'),
+              const SizedBox(height: 10),
+              _buildSectionLabel('Spend Public Key'),
+              _buildCopyCard(
+                context,
+                value: spend_pub,
+                icon: Icons.wallet_rounded,
+                onCopy: () => _copyToClipboard(context, spend_pub, 'Spend Public Key'),
+              ),
+              const SizedBox(height: 10),
+              _buildSectionLabel('View Public Key'),
+              _buildCopyCard(
+                context,
+                value: view_pub,
+                icon: Icons.wallet_rounded,
+                onCopy: () => _copyToClipboard(context, view_pub, 'View Public Key'),
+              ),
+              const SizedBox(height: 10),
+              _buildSectionLabel('Private Spend Key'),
+              _buildCopyCard(
+                context,
+                value: private_spend_key,
+                icon: Icons.wallet_rounded,
+                onCopy: () => _copyToClipboard(context, private_spend_key, 'Private Spend Key'),
+              ),
+              const SizedBox(height: 10),
+              _buildSectionLabel('Private View Key'),
+              _buildCopyCard(
+                context,
+                value: private_view_key,
+                icon: Icons.wallet_rounded,
+                onCopy: () => _copyToClipboard(context, private_view_key, 'Private View Key'),
+              ),
             ],
           ),
         ),

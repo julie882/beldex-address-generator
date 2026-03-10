@@ -47,6 +47,10 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
 
     final address = walletData['address'] ?? '';
     final finalSeeds = walletData['seeds'] ?? '';
+    final spend_pub = walletData['spend_pub'] ?? '';
+    final view_pub = walletData['view_pub'] ?? '';
+    final private_spend_key = walletData['private_spend_key'] ?? '';
+    final private_view_key = walletData['private_view_key'] ?? '';
 
     if(finalSeeds != seeds){
       setState(() => _isLoading = false);
@@ -64,6 +68,10 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
           name: name,
           address: address,
           seeds: seeds,
+          spend_pub: spend_pub,
+          view_pub: view_pub,
+          private_spend_key: private_spend_key,
+          private_view_key: private_view_key,
         ),
       ),
     );
@@ -155,8 +163,8 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
                 ),
                 const SizedBox(height: 32),
                 _buildRestoreButton(),
-                const SizedBox(height: 20),
-                _buildWarningCard(),
+                // const SizedBox(height: 20),
+                // _buildWarningCard(),
               ],
             ),
           ),

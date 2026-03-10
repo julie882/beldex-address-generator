@@ -15,7 +15,11 @@ FFI_EXPORT char* ffi_generate_wallet()
 {
     wallet w = generate_new_wallet();
 
+    // Combine all the wallet data into a single string
+    // Address
     std::string combined = w.address;
+
+    // Seed
     if (!w.seed.empty()) {
         combined += ":::";
         for (size_t i = 0; i < w.seed.size(); ++i) {
@@ -25,6 +29,16 @@ FFI_EXPORT char* ffi_generate_wallet()
             }
         }
     }
+
+    // Keys
+    combined += ":::";
+    combined += w.spend_pub;
+    combined += ":::";
+    combined += w.view_pub;
+    combined += ":::";
+    combined += w.private_spend_key;
+    combined += ":::";
+    combined += w.private_view_key;
 
     std::cout << "combined: " << combined << std::endl;
     char* result = (char*)malloc(combined.size() + 1);
@@ -37,7 +51,11 @@ FFI_EXPORT char* ffi_restore_wallet(const char* input_seed)
 {
     wallet w = restore_wallet(input_seed);
 
+    // Combine all the wallet data into a single string
+    // Address
     std::string combined = w.address;
+
+    // Seed
     if (!w.seed.empty()) {
         combined += ":::";
         for (size_t i = 0; i < w.seed.size(); ++i) {
@@ -47,6 +65,16 @@ FFI_EXPORT char* ffi_restore_wallet(const char* input_seed)
             }
         }
     }
+
+    // Keys
+    combined += ":::";
+    combined += w.spend_pub;
+    combined += ":::";
+    combined += w.view_pub;
+    combined += ":::";
+    combined += w.private_spend_key;
+    combined += ":::";
+    combined += w.private_view_key;
 
     std::cout << "combined: " << combined << std::endl;
     char* result = (char*)malloc(combined.size() + 1);

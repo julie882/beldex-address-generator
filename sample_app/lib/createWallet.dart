@@ -36,6 +36,10 @@ class _CreateWalletPageState extends State<CreateWalletPage> {
 
     final address = walletData['address'] ?? '';
     final seeds = walletData['seeds'] ?? '';
+    final spend_pub = walletData['spend_pub'] ?? '';
+    final view_pub = walletData['view_pub'] ?? '';
+    final private_spend_key = walletData['private_spend_key'] ?? '';
+    final private_view_key = walletData['private_view_key'] ?? '';
 
     if (!mounted) return;
     setState(() => _isLoading = false);
@@ -47,6 +51,10 @@ class _CreateWalletPageState extends State<CreateWalletPage> {
           name: name,
           address: address,
           seeds: seeds,
+          spend_pub: spend_pub,
+          view_pub: view_pub,
+          private_spend_key: private_spend_key,
+          private_view_key: private_view_key,
         ),
       ),
     );

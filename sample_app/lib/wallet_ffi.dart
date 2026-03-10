@@ -70,10 +70,18 @@ class WalletFfi {
     
     String address = parts.isNotEmpty ? parts[0] : '';
     String seeds = parts.length > 1 ? parts[1] : '';
+    String spend_pub = parts.length > 2 ? parts[2] : '';
+    String view_pub = parts.length > 3 ? parts[3] : '';
+    String private_spend_key = parts.length > 4 ? parts[4] : '';
+    String private_view_key = parts.length > 5 ? parts[5] : '';
 
     return {
       'address': address,
       'seeds': seeds,
+      'spend_pub': spend_pub,
+      'view_pub': view_pub,
+      'private_spend_key': private_spend_key,
+      'private_view_key': private_view_key,
     };
   }
 
@@ -96,10 +104,18 @@ class WalletFfi {
     
     String address = parts.isNotEmpty ? parts[0] : '';
     String finalSeeds = parts.length > 1 ? parts[1] : '';
+    String spend_pub = parts.length > 2 ? parts[2] : '';
+    String view_pub = parts.length > 3 ? parts[3] : '';
+    String private_spend_key = parts.length > 4 ? parts[4] : '';
+    String private_view_key = parts.length > 5 ? parts[5] : '';
 
     return {
       'address': address,
       'seeds': finalSeeds,
+      'spend_pub': spend_pub,
+      'view_pub': view_pub,
+      'private_spend_key': private_spend_key,
+      'private_view_key': private_view_key,
     };
   }
 }

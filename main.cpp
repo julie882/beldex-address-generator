@@ -41,6 +41,10 @@ int main(int argc, char* argv[]) {
     std::cout<<std::endl;
     std::string address = w.address;
     std::cout << "Wallet Address: " << address << std::endl;       
+    std::cout << "Spend Public Key: " << w.spend_pub << std::endl;
+    std::cout << "View Public Key: " << w.view_pub << std::endl;
+    std::cout << "Private Spend Key: " << w.private_spend_key << std::endl;
+    std::cout << "Private View Key: " << w.private_view_key << std::endl;
     
 }
 

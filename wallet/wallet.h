@@ -9,6 +9,10 @@
 
 struct wallet{
     std::string address;
+    std::string view_pub;
+    std::string spend_pub;
+    std::string private_view_key;
+    std::string private_spend_key;
     std::vector<std::string> seed;
 };
 

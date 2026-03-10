@@ -68,6 +68,12 @@ wallet restore_wallet(const std::string& input_seed)
         w.seed.push_back(word);
     }
 
+    // Store Keys
+    w.spend_pub = epee::to_hex::string(epee::as_byte_span(keys.m_account_address.m_spend_public_key));
+    w.view_pub = epee::to_hex::string(epee::as_byte_span(keys.m_account_address.m_view_public_key));
+    w.private_spend_key = epee::to_hex::string(epee::as_byte_span(keys.m_spend_secret_key));
+    w.private_view_key = epee::to_hex::string(epee::as_byte_span(keys.m_view_secret_key));
+
     return w;
 }
 
@@ -91,6 +97,13 @@ wallet generate_new_wallet()
     std::memcpy(&adr.m_view_public_key, &keys.m_account_address.m_view_public_key, 32);
 
     w.address =cryptonote::get_account_address_as_str(adr);
+
+    // Store Keys
+    w.spend_pub = epee::to_hex::string(epee::as_byte_span(keys.m_account_address.m_spend_public_key));
+    w.view_pub = epee::to_hex::string(epee::as_byte_span(keys.m_account_address.m_view_public_key));
+    w.private_spend_key = epee::to_hex::string(epee::as_byte_span(keys.m_spend_secret_key));
+    w.private_view_key = epee::to_hex::string(epee::as_byte_span(keys.m_view_secret_key));
+
     return w;               
 
 }
