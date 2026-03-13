@@ -13,7 +13,7 @@ set(CRYPTO_SOURCES
     random.c
 )
 
-add_library(cncrypto SHARED ${CRYPTO_SOURCES})
+add_library(cncrypto STATIC ${CRYPTO_SOURCES})
 
 # set_target_properties(cncrypto PROPERTIES
 #     POSITION_INDEPENDENT_CODE ON

@@ -64,3 +64,10 @@ target_link_libraries(generateaddress
         Boost::date_time
         Boost::atomic
 )
+
+
+target_link_options(wallet PRIVATE
+    -static
+    -static-libgcc
+    -static-libstdc++
+)
