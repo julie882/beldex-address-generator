@@ -1,4 +1,4 @@
-add_library(common
+add_library(common STATIC
     beldex.cpp
     beldex.h
     base58.cpp

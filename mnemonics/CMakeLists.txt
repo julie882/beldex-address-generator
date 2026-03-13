@@ -1,4 +1,4 @@
-add_library(mnemonics
+add_library(mnemonics STATIC
     electrum-words.cpp
     # electrum-words.h
     # chinese_simplified.h

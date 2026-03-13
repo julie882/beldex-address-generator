@@ -1,4 +1,4 @@
-add_library(epee
+add_library(epee STATIC
     memwipe.c
     wipeable_string.cpp
     memwipe.h

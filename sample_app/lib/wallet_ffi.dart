@@ -99,7 +99,7 @@ class WalletFfi {
     }
 
     if (Platform.isAndroid) {
-      return DynamicLibrary.open('libwallet.so');
+      return _openAndroidLibrary();
     }
 
     if (Platform.isLinux) {
@@ -111,6 +111,20 @@ class WalletFfi {
     }
 
     return DynamicLibrary.process();
+  }
+
+  DynamicLibrary _openAndroidLibrary() {
+    switch (Abi.current()) {
+      case Abi.androidArm:
+      case Abi.androidArm64:
+      case Abi.androidX64:
+        // Android picks the correct ABI-specific libwallet.so from the APK/AAB.
+        return DynamicLibrary.open('libwallet.so');
+      default:
+        throw UnsupportedError(
+          'Unsupported Android ABI for libwallet.so: ${Abi.current()}',
+        );
+    }
   }
 
   /// Generates a new wallet returning `{ 'address': String, 'seeds': String }`

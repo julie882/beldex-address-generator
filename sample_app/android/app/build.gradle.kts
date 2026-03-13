@@ -5,6 +5,9 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val walletApiDir = rootProject.projectDir.resolve("../api/andriod")
+val generatedJniLibsDir = layout.buildDirectory.dir("generated/jniLibs")
+
 android {
     namespace = "com.example.macos_sample_app"
     compileSdk = flutter.compileSdkVersion
@@ -30,6 +33,10 @@ android {
         versionName = flutter.versionName
     }
 
+    sourceSets {
+        getByName("main").jniLibs.srcDir(generatedJniLibsDir)
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
@@ -37,6 +44,45 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+}
+
+val prepareWalletJniLibs by tasks.registering(Sync::class) {
+    into(generatedJniLibsDir)
+
+    from(walletApiDir.resolve("arm64-v8a")) {
+        into("arm64-v8a")
+    }
+
+    from(walletApiDir.resolve("armabi-v7a")) {
+        into("armeabi-v7a")
+    }
+
+    from(walletApiDir.resolve("x86_64")) {
+        into("x86_64")
+    }
+
+    doFirst {
+        if (!walletApiDir.exists()) {
+            throw GradleException(
+                "Expected Android wallet libraries at: ${walletApiDir.absolutePath}",
+            )
+        }
+
+        val missingDirs =
+            listOf("arm64-v8a", "armabi-v7a", "x86_64").filterNot {
+                walletApiDir.resolve(it).exists()
+            }
+
+        if (missingDirs.isNotEmpty()) {
+            throw GradleException(
+                "Missing Android wallet ABI directories: ${missingDirs.joinToString()}",
+            )
+        }
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn(prepareWalletJniLibs)
 }
 
 flutter {
