@@ -32,7 +32,7 @@ class WalletFfi {
     } else if (Platform.isAndroid || Platform.isLinux) {
       _lib = DynamicLibrary.process(); // Or specific .so path
     } else if (Platform.isWindows) {
-      _lib = DynamicLibrary.open('wallet.dll');
+      _lib = DynamicLibrary.open('libwallet.dll');
     } else {
       throw UnsupportedError('Unsupported platform');
     }
