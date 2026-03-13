@@ -1,8 +1,12 @@
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Shared library
-add_library(wallet SHARED
+set(WALLET_LIBRARY_TYPE SHARED)
+if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    set(WALLET_LIBRARY_TYPE STATIC)
+endif()
+
+add_library(wallet ${WALLET_LIBRARY_TYPE}
     wallet.cpp
     ffi_interface.cpp
 )
@@ -31,4 +35,3 @@ target_link_libraries(wallet
         Boost::system
         Boost::thread
 )
-

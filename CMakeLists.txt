@@ -1,8 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(AddressGenerator)
 
+if(POLICY CMP0167)
+    cmake_policy(SET CMP0167 OLD)
+endif()
+
 if(ANDROID)
-    message(STATUS `Building andriod .......... ${ANDROID}`)
+    message(STATUS "Building android: ${ANDROID}")
     set(BOOST_ROOT "${CMAKE_SOURCE_DIR}/boost_1_83_0")
     set(BOOST_INCLUDE_DIR "${BOOST_ROOT}/")  # root has all headers like boost/crc.hpp
     set(BOOST_LIB_DIR "${BOOST_ROOT}/stage/${ANDROID_ABI}/lib")
@@ -52,22 +56,14 @@ target_include_directories(generateaddress PUBLIC
 
 target_link_libraries(generateaddress 
     PRIVATE 
-        cryptonote_basic
         wallet
-        common
-        cncrypto
-        epee 
-        mnemonics
-        Boost::serialization
-        Boost::thread
-        Boost::program_options
-        Boost::date_time
-        Boost::atomic
 )
 
 
-target_link_options(wallet PRIVATE
-    -static
-    -static-libgcc
-    -static-libstdc++
-)
+if(WIN32 OR (UNIX AND NOT APPLE AND NOT ANDROID))
+    target_link_options(wallet PRIVATE
+        -static
+        -static-libgcc
+        -static-libstdc++
+    )
+endif()

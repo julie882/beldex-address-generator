@@ -41,21 +41,34 @@ class _CreateWalletPageState extends State<CreateWalletPage> {
     final private_spend_key = walletData['private_spend_key'] ?? '';
     final private_view_key = walletData['private_view_key'] ?? '';
 
+    if (address.isEmpty ||
+        seeds.isEmpty ||
+        spend_pub.isEmpty ||
+        view_pub.isEmpty ||
+        private_spend_key.isEmpty ||
+        private_view_key.isEmpty) {
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      _showError('Wallet generation returned incomplete data.');
+      return;
+    }
+
     if (!mounted) return;
     setState(() => _isLoading = false);
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => WalletDetailsPage(
-          name: name,
-          address: address,
-          seeds: seeds,
-          spend_pub: spend_pub,
-          view_pub: view_pub,
-          private_spend_key: private_spend_key,
-          private_view_key: private_view_key,
-        ),
+        builder:
+            (_) => WalletDetailsPage(
+              name: name,
+              address: address,
+              seeds: seeds,
+              spend_pub: spend_pub,
+              view_pub: view_pub,
+              private_spend_key: private_spend_key,
+              private_view_key: private_view_key,
+            ),
       ),
     );
   }
@@ -85,7 +98,10 @@ class _CreateWalletPageState extends State<CreateWalletPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -156,22 +172,30 @@ class _CreateWalletPageState extends State<CreateWalletPage> {
               color: const Color(0xFF7C4DFF).withOpacity(0.2),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(Icons.add_circle_outline_rounded,
-                color: Color(0xFF7C4DFF), size: 28),
+            child: const Icon(
+              Icons.add_circle_outline_rounded,
+              color: Color(0xFF7C4DFF),
+              size: 28,
+            ),
           ),
           const SizedBox(width: 16),
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('New Wallet',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
+                Text(
+                  'New Wallet',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
                 SizedBox(height: 4),
-                Text('A fresh wallet with a new 25-word seed phrase.',
-                    style: TextStyle(color: Colors.white54, fontSize: 13)),
+                Text(
+                  'A fresh wallet with a new 25-word seed phrase.',
+                  style: TextStyle(color: Colors.white54, fontSize: 13),
+                ),
               ],
             ),
           ),
@@ -201,8 +225,10 @@ class _CreateWalletPageState extends State<CreateWalletPage> {
           hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
           prefixIcon: Icon(icon, color: const Color(0xFF7C4DFF)),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
         ),
       ),
     );
@@ -228,25 +254,31 @@ class _CreateWalletPageState extends State<CreateWalletPage> {
           ],
         ),
         child: Center(
-          child: _isLoading
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Colors.white),
-                )
-              : const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.flash_on_rounded, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text('Create Wallet',
+          child:
+              _isLoading
+                  ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                  : const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.flash_on_rounded, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'Create Wallet',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)),
-                  ],
-                ),
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
         ),
       ),
     );

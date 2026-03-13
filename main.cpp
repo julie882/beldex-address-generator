@@ -1,20 +1,6 @@
 #include <iostream>
 #include <string>
-#include <vector>
-#include <sstream>
-#include <cstring>
-#include <epee/wipeable_string.h>
-#include <crypto/crypto.h>
-#include <mnemonics/electrum-words.h>
-#include <iomanip>
-#include "cryptonote_basic/cryptonote_basic.h"
-extern "C"
-{
-#include "crypto/keccak.h"
-}
-#include "wallet/wallet.cpp"
-#include <string>
-#include <vector>
+#include "wallet/wallet.h"
 
 int main(int argc, char* argv[]) {
 
@@ -45,6 +31,6 @@ int main(int argc, char* argv[]) {
     std::cout << "View Public Key: " << w.view_pub << std::endl;
     std::cout << "Private Spend Key: " << w.private_spend_key << std::endl;
     std::cout << "Private View Key: " << w.private_view_key << std::endl;
-    
-}
 
+    return 0;
+}

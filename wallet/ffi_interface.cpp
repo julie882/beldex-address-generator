@@ -40,7 +40,6 @@ FFI_EXPORT char* ffi_generate_wallet()
     combined += ":::";
     combined += w.private_view_key;
 
-    std::cout << "combined: " << combined << std::endl;
     char* result = (char*)malloc(combined.size() + 1);
     std::strcpy(result, combined.c_str());
 
@@ -82,7 +81,6 @@ FFI_EXPORT char* ffi_restore_wallet(const char* input_seed)
     combined += ":::";
     combined += w.private_view_key;
 
-    // std::cout << "combined: " << combined << std::endl;
     char* result = (char*)malloc(combined.size() + 1);
     std::strcpy(result, combined.c_str());
 

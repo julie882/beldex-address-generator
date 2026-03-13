@@ -12,6 +12,56 @@ typedef RestoreWalletDart = Pointer<Utf8> Function(Pointer<Utf8> input_seed);
 typedef FreeStringC = Void Function(Pointer<Utf8> ptr);
 typedef FreeStringDart = void Function(Pointer<Utf8> ptr);
 
+class WalletPayload {
+  const WalletPayload({
+    required this.address,
+    required this.seeds,
+    required this.spendPub,
+    required this.viewPub,
+    required this.privateSpendKey,
+    required this.privateViewKey,
+  });
+
+  final String address;
+  final String seeds;
+  final String spendPub;
+  final String viewPub;
+  final String privateSpendKey;
+  final String privateViewKey;
+
+  static WalletPayload fromCombinedString(String payload) {
+    final parts = payload.split(':::');
+
+    return WalletPayload(
+      address: parts.isNotEmpty ? parts[0] : '',
+      seeds: parts.length > 1 ? parts[1] : '',
+      spendPub: parts.length > 2 ? parts[2] : '',
+      viewPub: parts.length > 3 ? parts[3] : '',
+      privateSpendKey: parts.length > 4 ? parts[4] : '',
+      privateViewKey: parts.length > 5 ? parts[5] : '',
+    );
+  }
+
+  bool get isComplete =>
+      address.isNotEmpty &&
+      seeds.isNotEmpty &&
+      spendPub.isNotEmpty &&
+      viewPub.isNotEmpty &&
+      privateSpendKey.isNotEmpty &&
+      privateViewKey.isNotEmpty;
+
+  Map<String, String> toMap() {
+    return {
+      'address': address,
+      'seeds': seeds,
+      'spend_pub': spendPub,
+      'view_pub': viewPub,
+      'private_spend_key': privateSpendKey,
+      'private_view_key': privateViewKey,
+    };
+  }
+}
+
 class WalletFfi {
   static final WalletFfi _instance = WalletFfi._internal();
   factory WalletFfi() => _instance;
@@ -22,33 +72,44 @@ class WalletFfi {
   late FreeStringDart _freeString;
 
   WalletFfi._internal() {
-    // Load the dynamic library
-    if (Platform.isMacOS || Platform.isIOS) {
-      // In a real app this would typically be loaded via process or app bundle frameworks wrapper, 
-      // but if we link it locally we can point to it directly:
-      // Since this is a sample app running locally, we can point to the absolute path 
-      // or copy the dylib to the build folder.
-      _lib = DynamicLibrary.open('/Users/apple/Documents/sowjanya/wallet/build/wallet/libwallet.dylib');
-    } else if (Platform.isAndroid || Platform.isLinux) {
-      _lib = DynamicLibrary.process(); // Or specific .so path
-    } else if (Platform.isWindows) {
-      _lib = DynamicLibrary.open('libwallet.dll');
-    } else {
-      throw UnsupportedError('Unsupported platform');
-    }
+    _lib = _openLibrary();
 
     // Lookup functions
-    _generateWallet = _lib
-        .lookup<NativeFunction<GenerateWalletC>>('ffi_generate_wallet')
-        .asFunction();
+    _generateWallet =
+        _lib
+            .lookup<NativeFunction<GenerateWalletC>>('ffi_generate_wallet')
+            .asFunction();
 
-    _restoreWallet = _lib
-        .lookup<NativeFunction<RestoreWalletC>>('ffi_restore_wallet')
-        .asFunction();
+    _restoreWallet =
+        _lib
+            .lookup<NativeFunction<RestoreWalletC>>('ffi_restore_wallet')
+            .asFunction();
 
-    _freeString = _lib
-        .lookup<NativeFunction<FreeStringC>>('ffi_free')
-        .asFunction();
+    _freeString =
+        _lib.lookup<NativeFunction<FreeStringC>>('ffi_free').asFunction();
+  }
+
+  DynamicLibrary _openLibrary() {
+    if (Platform.isIOS) {
+      return DynamicLibrary.process();
+    }
+
+    if (Platform.isMacOS) {
+      return DynamicLibrary.open(
+        '/Users/apple/Documents/sowjanya/wallet/build/wallet/libwallet.dylib',
+      );
+    }
+
+    if (Platform.isAndroid) {
+      return DynamicLibrary.open('libwallet.so');
+    }
+
+    if (Platform.isWindows) {
+      return DynamicLibrary.open('libwallet.dll');
+    }
+
+    // Fallback to process for other platforms (e.g., Linux)
+    return DynamicLibrary.process();
   }
 
   /// Generates a new wallet returning `{ 'address': String, 'seeds': String }`
@@ -60,62 +121,30 @@ class WalletFfi {
 
     final String resultString = resultPtr.toDartString();
 
-    print('resultString: $resultString');
-    
     // Free the C string memory to avoid leaks
     _freeString(resultPtr);
 
-    // Parse the result
-    final parts = resultString.split(':::');
-    
-    String address = parts.isNotEmpty ? parts[0] : '';
-    String seeds = parts.length > 1 ? parts[1] : '';
-    String spend_pub = parts.length > 2 ? parts[2] : '';
-    String view_pub = parts.length > 3 ? parts[3] : '';
-    String private_spend_key = parts.length > 4 ? parts[4] : '';
-    String private_view_key = parts.length > 5 ? parts[5] : '';
-
-    return {
-      'address': address,
-      'seeds': seeds,
-      'spend_pub': spend_pub,
-      'view_pub': view_pub,
-      'private_spend_key': private_spend_key,
-      'private_view_key': private_view_key,
-    };
+    return WalletPayload.fromCombinedString(resultString).toMap();
   }
 
-   /// restoring a wallet returning `{ 'address': String, 'seeds': String }`
-   Map<String, String> restoreWallet(String input_seed) {
-    final Pointer<Utf8> resultPtr = _restoreWallet(input_seed.toNativeUtf8());
-    if (resultPtr == nullptr) {
-      throw Exception('Failed to restore wallet via FFI');
+  /// restoring a wallet returning `{ 'address': String, 'seeds': String }`
+  Map<String, String> restoreWallet(String input_seed) {
+    final inputSeedPtr = input_seed.toNativeUtf8();
+
+    try {
+      final Pointer<Utf8> resultPtr = _restoreWallet(inputSeedPtr);
+      if (resultPtr == nullptr) {
+        throw Exception('Failed to restore wallet via FFI');
+      }
+
+      final String resultString = resultPtr.toDartString();
+
+      // Free the C string memory to avoid leaks
+      _freeString(resultPtr);
+
+      return WalletPayload.fromCombinedString(resultString).toMap();
+    } finally {
+      malloc.free(inputSeedPtr);
     }
-
-    final String resultString = resultPtr.toDartString();
-
-    // print('resultString: $resultString');
-    
-    // Free the C string memory to avoid leaks
-    _freeString(resultPtr);
-
-    // Parse the result
-    final parts = resultString.split(':::');
-    
-    String address = parts.isNotEmpty ? parts[0] : '';
-    String finalSeeds = parts.length > 1 ? parts[1] : '';
-    String spend_pub = parts.length > 2 ? parts[2] : '';
-    String view_pub = parts.length > 3 ? parts[3] : '';
-    String private_spend_key = parts.length > 4 ? parts[4] : '';
-    String private_view_key = parts.length > 5 ? parts[5] : '';
-
-    return {
-      'address': address,
-      'seeds': finalSeeds,
-      'spend_pub': spend_pub,
-      'view_pub': view_pub,
-      'private_spend_key': private_spend_key,
-      'private_view_key': private_view_key,
-    };
   }
 }

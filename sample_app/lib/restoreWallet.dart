@@ -24,12 +24,12 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
       return;
     }
 
-    final wordCount = seeds.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
+    final wordCount =
+        seeds.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
     if (seeds.isEmpty || wordCount != 25) {
       _showError('Please enter exactly 25 seed words.');
       return;
     }
-
 
     setState(() => _isLoading = true);
     await Future.delayed(const Duration(milliseconds: 800));
@@ -52,7 +52,18 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
     final private_spend_key = walletData['private_spend_key'] ?? '';
     final private_view_key = walletData['private_view_key'] ?? '';
 
-    if(finalSeeds != seeds){
+    if (address.isEmpty ||
+        finalSeeds.isEmpty ||
+        spend_pub.isEmpty ||
+        view_pub.isEmpty ||
+        private_spend_key.isEmpty ||
+        private_view_key.isEmpty) {
+      setState(() => _isLoading = false);
+      _showError('Wallet restoration returned incomplete data.');
+      return;
+    }
+
+    if (finalSeeds != seeds) {
       setState(() => _isLoading = false);
       _showError('Failed to restore wallet');
       return;
@@ -64,15 +75,16 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => WalletDetailsPage(
-          name: name,
-          address: address,
-          seeds: seeds,
-          spend_pub: spend_pub,
-          view_pub: view_pub,
-          private_spend_key: private_spend_key,
-          private_view_key: private_view_key,
-        ),
+        builder:
+            (_) => WalletDetailsPage(
+              name: name,
+              address: address,
+              seeds: seeds,
+              spend_pub: spend_pub,
+              view_pub: view_pub,
+              private_spend_key: private_spend_key,
+              private_view_key: private_view_key,
+            ),
       ),
     );
   }
@@ -103,7 +115,10 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.white,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
@@ -143,7 +158,9 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
                 Text(
                   'Enter your 25 words separated by spaces.',
                   style: TextStyle(
-                      color: Colors.white.withOpacity(0.3), fontSize: 12),
+                    color: Colors.white.withOpacity(0.3),
+                    fontSize: 12,
+                  ),
                 ),
                 const SizedBox(height: 32),
                 _buildRestoreButton(),
@@ -178,22 +195,30 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
               color: const Color(0xFF00E5FF).withOpacity(0.15),
               borderRadius: BorderRadius.circular(14),
             ),
-            child: const Icon(Icons.restore_rounded,
-                color: Color(0xFF00E5FF), size: 28),
+            child: const Icon(
+              Icons.restore_rounded,
+              color: Color(0xFF00E5FF),
+              size: 28,
+            ),
           ),
           const SizedBox(width: 16),
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Restore Wallet',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
+                Text(
+                  'Restore Wallet',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
                 SizedBox(height: 4),
-                Text('Recover your wallet using a 25-word seed phrase.',
-                    style: TextStyle(color: Colors.white54, fontSize: 13)),
+                Text(
+                  'Recover your wallet using a 25-word seed phrase.',
+                  style: TextStyle(color: Colors.white54, fontSize: 13),
+                ),
               ],
             ),
           ),
@@ -206,7 +231,10 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
     return Text(
       text,
       style: const TextStyle(
-          color: Colors.white70, fontSize: 14, fontWeight: FontWeight.w500),
+        color: Colors.white70,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
     );
   }
 
@@ -229,8 +257,10 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
           hintStyle: TextStyle(color: Colors.white.withOpacity(0.3)),
           prefixIcon: Icon(icon, color: const Color(0xFF00E5FF)),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
         ),
       ),
     );
@@ -255,16 +285,19 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
         decoration: InputDecoration(
           hintText: 'word1 word2 word3 ... word25',
           hintStyle: TextStyle(
-              color: Colors.white.withOpacity(0.25),
-              fontSize: 14,
-              letterSpacing: 0),
+            color: Colors.white.withOpacity(0.25),
+            fontSize: 14,
+            letterSpacing: 0,
+          ),
           prefixIcon: Padding(
             padding: const EdgeInsets.only(bottom: 60),
             child: Icon(Icons.key_outlined, color: const Color(0xFF00E5FF)),
           ),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
         ),
       ),
     );
@@ -293,25 +326,31 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
           ],
         ),
         child: Center(
-          child: _isLoading
-              ? const SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: Colors.white),
-                )
-              : const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.restore_rounded, color: Colors.white),
-                    SizedBox(width: 8),
-                    Text('Restore Wallet',
+          child:
+              _isLoading
+                  ? const SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                  : const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.restore_rounded, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'Restore Wallet',
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600)),
-                  ],
-                ),
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
         ),
       ),
     );
@@ -328,13 +367,19 @@ class _RestoreWalletPageState extends State<RestoreWalletPage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.warning_amber_rounded,
-              color: Colors.orange, size: 22),
+          const Icon(
+            Icons.warning_amber_rounded,
+            color: Colors.orange,
+            size: 22,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               'Never share your seed phrase with anyone. Keep it safe and offline.',
-              style: TextStyle(color: Colors.orange.withOpacity(0.9), fontSize: 13),
+              style: TextStyle(
+                color: Colors.orange.withOpacity(0.9),
+                fontSize: 13,
+              ),
             ),
           ),
         ],
