@@ -81,7 +81,7 @@ install(FILES "${FLUTTER_ICU_DATA_FILE}" DESTINATION "${INSTALL_BUNDLE_DATA_DIR}
 install(FILES "${FLUTTER_LIBRARY}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
   COMPONENT Runtime)
 
-file(COPY ${CMAKE_SOURCE_DIR}/../api/libwallet.dll
+file(COPY ${CMAKE_SOURCE_DIR}/../api/windows/libwallet.dll
   DESTINATION ${CMAKE_BINARY_DIR}/runner/Debug) 
 
 

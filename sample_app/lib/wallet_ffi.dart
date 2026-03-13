@@ -95,20 +95,21 @@ class WalletFfi {
     }
 
     if (Platform.isMacOS) {
-      return DynamicLibrary.open(
-        '/Users/apple/Documents/sowjanya/wallet/build/wallet/libwallet.dylib',
-      );
+      return DynamicLibrary.open('api/macos/libwallet.dylib');
     }
 
     if (Platform.isAndroid) {
       return DynamicLibrary.open('libwallet.so');
     }
 
+    if (Platform.isLinux) {
+      return DynamicLibrary.process();
+    }
+
     if (Platform.isWindows) {
       return DynamicLibrary.open('libwallet.dll');
     }
 
-    // Fallback to process for other platforms (e.g., Linux)
     return DynamicLibrary.process();
   }
 

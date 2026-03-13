@@ -165,9 +165,7 @@ namespace tools
     std::string encode_addr(uint64_t tag, std::string_view data)
     {
       std::string buf = get_varint_data(tag);
-      std::cout << "Tag: " << tag << ", varint: " << buf << std::endl;
       buf += data;
-      std::cout << "Data to encode: " << buf << std::endl;
       crypto::hash hash = crypto::cn_fast_hash(buf.data(), buf.size());
       const char* hash_data = reinterpret_cast<const char*>(&hash);
       buf.append(hash_data, addr_checksum_size);
