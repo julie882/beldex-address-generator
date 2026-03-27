@@ -1,0 +1,22 @@
+PODS:
+  - Flutter (1.0.0)
+  - WalletFFI (1.0.0):
+    - Flutter
+
+DEPENDENCIES:
+  - Flutter (from `Flutter`)
+  - WalletFFI (from `.`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: Flutter
+  WalletFFI:
+    :path: "."
+
+SPEC CHECKSUMS:
+  Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
+  WalletFFI: ae5bab0f1e441196091fc2f10d0d00467f4dad3e
+
+PODFILE CHECKSUM: 996cc2c41ec1c1dd7c2531656ada99fe4399614c
+
+COCOAPODS: 1.16.2

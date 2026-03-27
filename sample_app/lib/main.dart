@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'createWallet.dart';
 import 'restoreWallet.dart';
+import 'addressValidate.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -117,6 +119,16 @@ class HomePage extends StatelessWidget {
                   onTap: () => Navigator.push(
                     context,
                     _fadeRoute(const RestoreWalletPage()),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Validate Address Button
+                _OutlinedActionButton(
+                  label: 'Validate Address',
+                  icon: Icons.check_circle_outline_rounded,
+                  onTap: () => Navigator.push(
+                    context,
+                    _fadeRoute(const AddressValidatePage()),
                   ),
                 ),
                 const SizedBox(height: 40),

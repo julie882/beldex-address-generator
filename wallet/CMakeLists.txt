@@ -30,8 +30,9 @@ target_link_libraries(wallet
         mnemonics
         common
         cryptonote_basic
+        Boost::atomic
+        Boost::date_time
         Boost::serialization
-        Boost::program_options
         Boost::system
         Boost::thread
 )

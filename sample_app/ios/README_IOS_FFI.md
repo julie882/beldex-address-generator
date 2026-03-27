@@ -15,8 +15,21 @@ to be linked into the Runner app.
 
 ## Build the xcframework
 
-1. Build Boost separately for both SDKs.
-2. Export these environment variables:
+1. Build Boost for both iOS targets:
+
+```bash
+cd /Users/apple/Documents/sowjanya/wallet
+./build_boost_ios.sh
+```
+
+This produces:
+
+```text
+build-boost-ios/iphoneos
+build-boost-ios/iphonesimulator
+```
+
+2. If you want to use custom Boost prefixes instead, export these environment variables:
 
 ```bash
 export IOS_BOOST_SIM_ROOT=/absolute/path/to/boost-ios-simulator-prefix
@@ -37,17 +50,33 @@ sample_app/ios/WalletFFI.xcframework
 
 ## Connect it to Flutter Runner
 
-1. Open `sample_app/ios/Runner.xcworkspace` in Xcode.
-2. Drag `WalletFFI.xcframework` into the `Runner` project.
-3. In the `Runner` target, add it under `Frameworks, Libraries, and Embedded Content`.
-4. For a static xcframework, use `Do Not Embed`.
-5. Build the `Runner` scheme for an iOS simulator.
+The Flutter app now includes:
+
+- `sample_app/ios/Podfile`
+- `sample_app/ios/WalletFFI.podspec`
+
+After building the xcframework, run:
+
+```bash
+cd sample_app/ios
+pod install
+```
+
+Then open `sample_app/ios/Runner.xcworkspace` in Xcode or run the app with
+Flutter. CocoaPods will link `WalletFFI.xcframework` into the Runner target, so
+no manual drag-and-drop step is required.
 
 ## Important note about Boost
 
-The current C++ wallet target links Boost libraries. That means the iOS build
-will not succeed until Boost is also available for both iPhoneOS and
-iPhoneSimulator.
+The iOS flow needs static Boost libraries for both `iphoneos` and
+`iphonesimulator`. The repo now includes `build_boost_ios.sh`, which builds the
+minimal set required by the wallet:
+
+- `system`
+- `thread`
+- `serialization`
+- `atomic`
+- `date_time`
 
 ## Runtime behavior
 

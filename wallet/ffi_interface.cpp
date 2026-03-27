@@ -5,7 +5,7 @@
 #ifdef _WIN32
 #define FFI_EXPORT __declspec(dllexport)
 #else
-#define FFI_EXPORT __attribute__((visibility("default")))
+#define FFI_EXPORT __attribute__((visibility("default"))) __attribute__((used))
 #endif
 
 extern "C"

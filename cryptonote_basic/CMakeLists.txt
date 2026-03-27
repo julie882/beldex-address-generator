@@ -5,6 +5,5 @@ add_library(cryptonote_basic STATIC
 
 target_link_libraries(cryptonote_basic PRIVATE
    common
-    Boost::program_options
     Boost::serialization
 )

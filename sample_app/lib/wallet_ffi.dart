@@ -9,6 +9,9 @@ typedef GenerateWalletDart = Pointer<Utf8> Function();
 typedef RestoreWalletC = Pointer<Utf8> Function(Pointer<Utf8> input_seed);
 typedef RestoreWalletDart = Pointer<Utf8> Function(Pointer<Utf8> input_seed);
 
+typedef ValidateAddressC = Pointer<Utf8> Function(Pointer<Utf8> address);
+typedef ValidateAddressDart = Pointer<Utf8> Function(Pointer<Utf8> address);
+
 typedef FreeStringC = Void Function(Pointer<Utf8> ptr);
 typedef FreeStringDart = void Function(Pointer<Utf8> ptr);
 
@@ -62,6 +65,53 @@ class WalletPayload {
   }
 }
 
+class ValidateAddressPayload {
+  const ValidateAddressPayload({
+    required this.address,
+    required this.isValid,
+    required this.network,
+    required this.spendPub,
+    required this.viewPub,
+  });
+
+  final String address;
+  final bool isValid;
+  final String network;
+  final String spendPub;
+  final String viewPub;
+
+  static ValidateAddressPayload fromCombinedString(String payload) {
+    // Format: Address:data:::Valid:true/false:::Network:data:::Spend Public Key:data:::View Public Key:data
+    final parts = payload.split(':::');
+    
+    String getPartValue(int index) {
+      if (index >= parts.length) return '';
+      final splitPart = parts[index].split(':');
+      if (splitPart.length < 2) return '';
+      // Support case where value also has colons (though keys usually don't)
+      return splitPart.sublist(1).join(':').trim();
+    }
+    
+    return ValidateAddressPayload(
+      address: getPartValue(0),
+      isValid: getPartValue(1).toLowerCase() == 'true',
+      network: getPartValue(2),
+      spendPub: getPartValue(3),
+      viewPub: getPartValue(4),
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'address': address,
+      'isValid': isValid,
+      'network': network,
+      'spend_pub': spendPub,
+      'view_pub': viewPub,
+    };
+  }
+}
+
 class WalletFfi {
   static final WalletFfi _instance = WalletFfi._internal();
   factory WalletFfi() => _instance;
@@ -69,6 +119,7 @@ class WalletFfi {
   late DynamicLibrary _lib;
   late GenerateWalletDart _generateWallet;
   late RestoreWalletDart _restoreWallet;
+  late ValidateAddressDart _validateAddress;
   late FreeStringDart _freeString;
 
   WalletFfi._internal() {
@@ -84,6 +135,11 @@ class WalletFfi {
         _lib
             .lookup<NativeFunction<RestoreWalletC>>('ffi_restore_wallet')
             .asFunction();
+
+    _validateAddress =
+        _lib
+            .lookup<NativeFunction<ValidateAddressC>>('ffi_validate_address')
+            .asFunction();        
 
     _freeString =
         _lib.lookup<NativeFunction<FreeStringC>>('ffi_free').asFunction();
@@ -160,6 +216,29 @@ class WalletFfi {
       return WalletPayload.fromCombinedString(resultString).toMap();
     } finally {
       malloc.free(inputSeedPtr);
+          }
+  }
+
+  /// Validation of a wallet address returning map containing isValid, network, pubKeys etc.
+  Map<String, dynamic> validateAddress(String address) {
+    final inputAddrPtr = address.toNativeUtf8();
+
+    try {
+      final Pointer<Utf8> resultPtr = _validateAddress(inputAddrPtr);
+      if (resultPtr == nullptr) {
+        throw Exception('Failed to validate address via FFI');
+      }
+
+      final String resultString = resultPtr.toDartString();
+
+      print("resultString: $resultString");
+
+      // Free the C string memory to avoid leaks
+      _freeString(resultPtr);
+
+      return ValidateAddressPayload.fromCombinedString(resultString).toMap();
+    } finally {
+      malloc.free(inputAddrPtr);
     }
   }
 }
