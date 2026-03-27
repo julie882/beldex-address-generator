@@ -21,20 +21,17 @@ cd address-generator-c
  
 
 ```
-wget https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.tar.gz
-tar -xf boost_1_83_0.tar.gz
+wget https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.gz
+tar -xzf boost_1_83_0.tar.gz
 cd boost_1_83_0
 ./bootstrap.sh
 ./b2 --clean-all
-./b2 install \
-  --prefix=/usr/local \
-  --with-system \
-  --with-thread \
-  --with-filesystem \
-  --with-program_options \
-  --with-serialization \
-  --with-atomic \
-  --with-date_time
+./b2 toolset=gcc \
+--prefix=/usr/local \
+link=static runtime-link=static threading=multi variant=release \
+--with-system --with-thread --with-filesystem \
+--with-program_options --with-serialization --with-atomic --with-date_time \
+install
  ```
 
 Installed Location:
@@ -57,8 +54,9 @@ make -j$(nproc)
 ## Boost Installation:
 
 ```
-wget https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.tar.gz
-tar -xf boost_1_83_0.tar.gz
+wget https://archives.boost.io/release/1.83.0/source/boost_1_83_0.tar.gz
+tar -xzf boost_1_83_0.tar.gz
+cd boost_1_83_0
 ./bootstrap.sh
 ./b2 --clean-all
 ```
@@ -106,77 +104,91 @@ build-windows/wallet/libwallet.dll
 # Android
 
 ## Install procedure for android :
-`android-ndk-r26b-linux.zip`
+
+`android-ndk-r25c-linux.zip`
+```
+mkdir -p ~/Android/Sdk/ndk
+cd ~/Android/Sdk/ndk
+wget https://dl.google.com/android/repository/android-ndk-r25c-linux.zip
+unzip android-ndk-r25c-linux.zip
+mv android-ndk-r25c 25.2.9519653
+export ANDROID_NDK=~/Android/Sdk/ndk/25.2.9519653
+```
+
+## Build All required boost modules
+
+```
+mkdir boost_1_83_0
+cd boost_1_83_0
+./b2 --clean-all
+./bootstrap.sh
+
+```
 
 Supported ABIs: arm64-v8a, armeabi-v7a, x86_64
 
-```
-wget https://boostorg.jfrog.io/artifactory/main/release/1.83.0/source/boost_1_83_0.tar.gz)
-tar -xf boost_1_83_0.tar.gz
-./bootstrap.sh
-./b2 --clean-all
-```
 
 - Edit-file: `nano user-config.jam`
+
 Add:
 ```
-#using clang : android
-  : /path/to/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/armv7a-linux-androideabi21-clang++
-  : <cxxflags>"--target=armv7-none-linux-androideabi21 -fPIC"
-    <linkflags>"--target=armv7-none-linux-androideabi21"
-  ;
-#arm64-v8a (64-bit ARM)
-using clang : android64
-  : /path/to/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android21-clang++
-  : <cxxflags>"--target=aarch64-none-linux-android21 -fPIC"
-    <linkflags>"--target=aarch64-none-linux-android21"
-  ;
-x86_64
-#using clang : android_x86_64
-  : /path/to/ndk/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android21-clang++
-  : <cxxflags>"--target=x86_64-none-linux-android21 -fPIC"
-    <linkflags>"--target=x86_64-none-linux-android21"
-  ;
-  ```
+# armeabi-v7a
+using clang : armeabi
+    : /root/Android/Sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++
+    :
+    <compileflags>--target=armv7a-linux-androideabi21
+    <linkflags>--target=armv7a-linux-androideabi21
+;
 
-- Build Boost for  Android:
+# arm64-v8a
+using clang : arm64
+    : /root/Android/Sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++
+    :
+    <compileflags>--target=aarch64-linux-android21
+    <linkflags>--target=aarch64-linux-android21
+;
+
+# x86_64
+using clang : x86_64
+    : /root/Android/Sdk/ndk/25.2.9519653/toolchains/llvm/prebuilt/linux-x86_64/bin/clang++
+    :
+    <compileflags>--target=x86_64-linux-android21
+    <linkflags>--target=x86_64-linux-android21
+;  ```
+
+## Build Boost for  Android:
+
 armeabi-v7a
 ```
-./b2 toolset=clang-android \
+./b2 --clean-all
+
+./b2 toolset=clang-armeabi \
+  --user-config=./user-config.jam \
   target-os=android \
-  architecture=arm \
-  address-model=32 \
-  threading=multi \
   --prefix=./stage/armeabi-v7a \
-  --with-system --with-thread --with-atomic \
-  --with-serialization --with-program_options --with-date_time \
-  install
+  install -j$(nproc)
   ```
 
 arm64-v8a
 ```
-./b2 toolset=clang-android64 \
+./b2 --clean-all
+
+./b2 toolset=clang-arm64 \
+  --user-config=./user-config.jam \
   target-os=android \
-  architecture=arm \
-  address-model=64 \
-  threading=multi \
   --prefix=./stage/arm64-v8a \
-  --with-system --with-thread --with-atomic \
-  --with-serialization --with-program_options --with-date_time \
-  install
+  install -j$(nproc)
   ```
 
 x86_64
 ```
-./b2 toolset=clang-android_x86_64 \
+./b2 --clean-all
+
+./b2 toolset=clang-arm64 \
+  --user-config=./user-config.jam \
   target-os=android \
-  architecture=x86 \
-  address-model=64 \
-  threading=multi \
-  --prefix=./stage/x86_64 \
-  --with-system --with-thread --with-atomic \
-  --with-serialization --with-program_options --with-date_time \
-  install
+  --prefix=./stage/arm64-v8a \
+  install -j$(nproc)
   ```
 
 ## Project build:

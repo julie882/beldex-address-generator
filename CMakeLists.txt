@@ -46,6 +46,8 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(Boost_USE_STATIC_LIBS OFF)
+set(Boost_USE_STATIC_RUNTIME OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 if(NOT ANDROID AND NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
@@ -58,11 +60,11 @@ if(NOT ANDROID AND NOT CMAKE_SYSTEM_NAME STREQUAL "iOS")
   include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
+add_subdirectory(wallet)
 add_subdirectory(epee)
 add_subdirectory(common)
 add_subdirectory(crypto)
 add_subdirectory(mnemonics)
-add_subdirectory(wallet)
 add_subdirectory(cryptonote_basic)
 
 add_executable(generateaddress main.cpp)
@@ -84,7 +86,8 @@ target_link_libraries(generateaddress
 )
 
 
-if(WIN32 OR (UNIX AND NOT APPLE AND NOT ANDROID))
+#if(WIN32 OR (UNIX AND NOT APPLE AND NOT ANDROID))
+if(WIN32)
     target_link_options(wallet PRIVATE
         -static
         -static-libgcc

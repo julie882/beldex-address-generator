@@ -2,7 +2,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(WALLET_LIBRARY_TYPE SHARED)
-if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+if(CMAKE_SYSTEM_NAME MATCHES "iOS|Linux")
     set(WALLET_LIBRARY_TYPE STATIC)
 endif()
 
@@ -20,9 +20,6 @@ add_library(wallet ${WALLET_LIBRARY_TYPE}
 target_include_directories(wallet PUBLIC ${CMAKE_SOURCE_DIR})
 #target_include_directories(wallet_static PUBLIC ${CMAKE_SOURCE_DIR})
 
-target_include_directories(wallet PUBLIC
-    ${CMAKE_SOURCE_DIR}
-)
 target_link_libraries(wallet
     PUBLIC
         cncrypto

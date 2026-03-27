@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NDK=/root/sowjanya/wallet/android-ndk-r26b
+NDK=/root/Android/Sdk/ndk/25.2.9519653/android-ndk-r25c
 PROJECT_DIR=$(pwd)
 OUTPUT_DIR=$PROJECT_DIR/build-android
 
@@ -20,10 +20,10 @@ do
     cd $BUILD_DIR
 
     cmake $PROJECT_DIR \
-    -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake \
-    -DANDROID_ABI=$ABI \
-    -DANDROID_PLATFORM=android-21 \
-    -DCMAKE_BUILD_TYPE=Release
+        -DCMAKE_TOOLCHAIN_FILE=$NDK/build/cmake/android.toolchain.cmake \
+        -DANDROID_ABI=$ABI \
+        -DANDROID_PLATFORM=android-21 \
+        -DCMAKE_BUILD_TYPE=Release
 
     make -j$(nproc)
 
