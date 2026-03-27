@@ -1,11 +1,11 @@
 #include "base58.h"
-
 #include <array>
 #include <cassert>
 #include <cstring>
 #include <vector>
 #include <string_view>
 #include <iostream>
+#include <cstdint>
 
 #include "crypto/hash.h"
 #include "epee/int-util.h"
@@ -20,9 +20,9 @@ namespace tools
     {
       constexpr std::string_view alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"sv;
       constexpr size_t full_block_size = 8;
-      constexpr std::array<uint8_t, full_block_size + 1> encoded_block_sizes = {0, 2, 3, 5, 6, 7, 9, 10, 11};
-      constexpr size_t full_encoded_block_size = encoded_block_sizes.back();
-      constexpr std::array<int8_t, full_encoded_block_size + 1> decoded_block_sizes = {0, -1, 1, 2, -1, 3, 4, 5, -1, 6, 7, 8};
+      const std::array<uint8_t, 9> encoded_block_sizes = {0, 2, 3, 5, 6, 7, 9, 10, 11};
+      const size_t full_encoded_block_size = 11;
+      const std::array<int8_t, 12> decoded_block_sizes = {0, -1, 1, 2, -1, 3, 4, 5, -1, 6, 7, 8};
       constexpr size_t addr_checksum_size = 4;
 
       struct reverse_alphabet_table
@@ -36,11 +36,11 @@ namespace tools
             from_b58_lut[alphabet[i]] = i;
         }
 
-        constexpr int8_t operator[](char letter) const
+        int8_t operator[](char letter) const
         {
           return from_b58_lut[static_cast<unsigned char>(letter)];
         }
-      } constexpr reverse_alphabet;
+      } reverse_alphabet;
 
       uint64_t uint_8be_to_64(const uint8_t* data, size_t size)
       {
@@ -184,14 +184,14 @@ namespace tools
       checksum = addr_data.substr(addr_data.size() - addr_checksum_size);
 
       addr_data.resize(addr_data.size() - addr_checksum_size);
-     // crypto::hash hash = crypto::cn_fast_hash(addr_data.data(), addr_data.size());
-    //  std::string expected_checksum(reinterpret_cast<const char*>(&hash), addr_checksum_size);
-    //  if (expected_checksum != checksum) return false;
+     crypto::hash hash = crypto::cn_fast_hash(addr_data.data(), addr_data.size());
+     std::string expected_checksum(reinterpret_cast<const char*>(&hash), addr_checksum_size);
+     if (expected_checksum != checksum) return false;
 
-      //int read = tools::read_varint(addr_data.begin(), addr_data.end(), tag);
-    //  if (read <= 0) return false;
+      int read = tools::read_varint(addr_data.begin(), addr_data.end(), tag);
+     if (read <= 0) return false;
 
-     // data = addr_data.substr(read);
+     data = addr_data.substr(read);
       return true;
     }
   }

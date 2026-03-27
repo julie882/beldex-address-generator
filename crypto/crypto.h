@@ -39,5 +39,6 @@ namespace crypto {
     epee::to_hex::formatted(o, epee::as_byte_span(v));
     return o;
   }
+  bool check_key(const public_key &key);
 
 }

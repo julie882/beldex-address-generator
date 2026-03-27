@@ -4,24 +4,24 @@
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
 #include "cryptonote_basic.h"
-//#include "epee/string_tools.h"
 
 namespace cryptonote
 {
-  enum network_type
+
+  enum network_type : uint8_t
   {
     MAINNET = 0,
     TESTNET,
-    DEVNET
- };
+    DEVNET,
+  };
 
   std::string get_account_address_as_str(
       const account_public_address& adr);
 
-  bool get_account_address_from_str(
-      address_parse_info& info,
-      network_type nettype,
-      const std::string_view str
-    );
 
+  bool get_account_address_from_str(
+        address_parse_info& info,
+        network_type nettype,
+        const std::string_view str
+    );    
 }   

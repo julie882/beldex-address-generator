@@ -86,44 +86,30 @@ FFI_EXPORT char* ffi_restore_wallet(const char* input_seed)
 
     return result;
 }
-
-// -------------------- VALIDATE ADDRESS --------------------
-FFI_EXPORT char* ffi_validate_address(const char* input_address)
-{
-    if (!input_address)
-        return nullptr;
-
-    address_info info = validate_address(std::string(input_address));
-
-    // Format:
-    // valid:::type:::network:::spend_key:::view_key:::payment_id
-
-    // If invalid, return minimal response
-    if (!info.valid)
-    {
-        std::string combined = "0:::invalid";
-        char* result = (char*)malloc(combined.size() + 1);
-        std::strcpy(result, combined.c_str());
-        return result;
-    }
-
-    std::string combined;
-
-    combined += "1";
-    combined += ":::" + info.type;
-    combined += ":::" + info.network;
-    combined += ":::" + info.spend_public_key;
-    combined += ":::" + info.view_public_key;
-    combined += ":::" + info.payment_id;
-
-    char* result = (char*)malloc(combined.size() + 1);
-    std::strcpy(result, combined.c_str());
-    return result;
-}
-
 FFI_EXPORT void ffi_free(char* ptr)
 {
     free(ptr);
 }
 
+// Validate address
+FFI_EXPORT char* ffi_validate_address(const char* input_addr) {
+    if(!input_addr) return nullptr;
+    std::string addr(input_addr);
+    resolveAddress validAddr = validate_address(addr);
+
+    std::ostringstream oss;
+    oss << "Address:" << addr << ":::";
+    oss << "Valid:" << (validAddr.valid ? "true" : "false") << ":::";
+    oss << "Network:" << validAddr.nettype << ":::";
+    oss << "Spend Public Key:" << validAddr.spend_pub << ":::";
+    oss << "View Public Key:" << validAddr.view_pub;
+
+    std::string str = oss.str();
+    char* result = (char*)malloc(str.size()+1);
+    std::strcpy(result, str.c_str());
+    return result;
 }
+    
+}
+
+

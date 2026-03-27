@@ -6,6 +6,18 @@
 #include <string>
 #include <vector>
 
+#pragma once
+
+#ifdef _WIN32
+  #ifdef WALLET_BUILD
+    #define WALLET_API __declspec(dllexport)
+  #else
+    #define WALLET_API __declspec(dllimport)
+  #endif
+#else
+  #define WALLET_API
+#endif
+
 
 struct wallet{
     std::string address;
@@ -16,15 +28,11 @@ struct wallet{
     std::vector<std::string> seed;
 };
 
-struct address_info
-{
+struct resolveAddress{
     bool valid;
-    std::string type;
-    std::string network;
-    std::string spend_public_key;
-    std::string view_public_key;
-
-    std::string payment_id; // empty if not integrated
+    std::string nettype;
+    std::string view_pub;
+    std::string spend_pub;
 };
 
 
@@ -32,4 +40,5 @@ wallet restore_wallet(const std::string& input_seed);
 
 wallet generate_new_wallet();
 
-address_info validate_address(const std::string& address);
+resolveAddress validate_address(const std::string& addr);
+

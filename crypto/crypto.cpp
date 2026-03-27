@@ -125,5 +125,9 @@ namespace crypto
 
     return rng;
   }
+  bool check_key(const public_key &key) {
+    ge_p3 point;
+    return ge_frombytes_vartime(&point, &key) == 0;
+  }
 
 } // namespace crypto

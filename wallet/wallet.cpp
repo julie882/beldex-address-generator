@@ -8,13 +8,18 @@
 #include <mnemonics/electrum-words.h>
 #include "cryptonote_basic/cryptonote_basic.h"
 #include "cryptonote_basic/cryptonote_basic_impl.h"
-
+#include "common/base58.h"
 extern "C"
 {
 #include "crypto/keccak.h"
 }
 #include "wallet.h"
 
+#ifdef _WIN32
+#define WALLET_API __declspec(dllexport)
+#else
+#define WALLET_API
+#endif
 
 struct account_keys
 {
@@ -23,7 +28,7 @@ struct account_keys
     cryptonote::account_public_address m_account_address;
 };
 
-struct wallet;
+//struct wallet;
 
 account_keys generate(const crypto::secret_key& recovery_key, bool recover, bool two_random)
 {
@@ -35,9 +40,9 @@ account_keys generate(const crypto::secret_key& recovery_key, bool recover, bool
     crypto::generate_keys(m_keys.m_account_address.m_view_public_key, m_keys.m_view_secret_key, second, two_random ? false : true);
 
     return m_keys;
-} 
+}
 
-wallet restore_wallet(const std::string& input_seed)
+WALLET_API wallet restore_wallet(const std::string& input_seed)
 {
     wallet w;
     crypto::secret_key seed_key;
@@ -81,7 +86,7 @@ wallet restore_wallet(const std::string& input_seed)
     return w;
 }
 
-wallet generate_new_wallet()
+WALLET_API wallet generate_new_wallet()
 {
     wallet w;
     account_keys keys = generate(crypto::secret_key(), false, false);
@@ -110,57 +115,46 @@ wallet generate_new_wallet()
 
     return w;               
 
-} 
+}
 
-address_info validate_address(const std::string& address)
-{
-    address_info result{};
+WALLET_API resolveAddress validate_address(const std::string& addr) {
+    resolveAddress validAddr;
     cryptonote::address_parse_info info;
 
-    cryptonote::network_type nettype = cryptonote::MAINNET;
-    bool valid = false;
+    uint64_t prefix = 0;
+    std::string data;
 
-    for (cryptonote::network_type nt : {cryptonote::MAINNET, cryptonote::TESTNET, cryptonote::DEVNET})
-    {
-        if (cryptonote::get_account_address_from_str(info, nt, address))
-        {
-            nettype = nt;
-            valid = true;
-            break;
-        }
+    // Decode Base58
+    if (!tools::base58::decode_addr(addr, prefix, data)) {
+        std::cout << "Base58 decode failed" << std::endl;
+        validAddr.valid = false;
+        return validAddr;
     }
 
-    result.valid = valid;
-
-    if (!valid)
-    {
-        result.type = "invalid";
-        return result;
+    // Map prefix to network enum
+    cryptonote::network_type nettype;
+    if (prefix == 0xd1 || prefix == 19 || prefix == 42) nettype = cryptonote::MAINNET;
+    else if (prefix == 53 || prefix == 54 || prefix == 63) nettype = cryptonote::TESTNET;
+    else if (prefix == 24 || prefix == 25 || prefix == 36) nettype = cryptonote::DEVNET;
+    else {
+        std::cout << "Unknown prefix: " << prefix << std::endl;
+        validAddr.valid = false;
+        return validAddr;
     }
 
-    // Type
-    if (info.is_subaddress)
-        result.type = "subaddress";
-    else if (info.has_payment_id)
-        result.type = "integrated";
-    else
-        result.type = "standard";
-
-    // Network
-    if (nettype == cryptonote::MAINNET) result.network = "mainnet";
-    else if (nettype == cryptonote::TESTNET) result.network = "testnet";
-    else if (nettype == cryptonote::DEVNET) result.network = "devnet";
-
-    // Keys
-    const auto& addr = info.address;
-    result.spend_public_key = epee::to_hex::string(epee::as_byte_span(addr.m_spend_public_key));
-    result.view_public_key  = epee::to_hex::string(epee::as_byte_span(addr.m_view_public_key));
-
-    // Payment ID (NO string_tools)
-    if (info.has_payment_id)
-    {
-        result.payment_id = epee::to_hex::string(epee::as_byte_span(info.payment_id));
+    // Parse address
+    validAddr.valid = cryptonote::get_account_address_from_str(info, nettype, addr);
+    if (!validAddr.valid) {
+        std::cout << "Address parsing failed: invalid checksum or keys." << std::endl;
+        return validAddr;
     }
 
-    return result;
+    validAddr.nettype = (nettype == cryptonote::MAINNET) ? "mainnet" :
+                        (nettype == cryptonote::TESTNET) ? "testnet" : "devnet";
+
+    // Populate keys
+    validAddr.spend_pub = epee::to_hex::string(epee::as_byte_span(info.address.m_spend_public_key));
+    validAddr.view_pub = epee::to_hex::string(epee::as_byte_span(info.address.m_view_public_key));
+
+    return validAddr;
 }
