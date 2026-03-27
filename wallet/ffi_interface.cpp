@@ -5,7 +5,7 @@
 #ifdef _WIN32
 #define FFI_EXPORT __declspec(dllexport)
 #else
-#define FFI_EXPORT __attribute__((visibility("default"))) __attribute__((used))
+#define FFI_EXPORT __attribute__((visibility("default")))
 #endif
 
 extern "C"
@@ -86,6 +86,41 @@ FFI_EXPORT char* ffi_restore_wallet(const char* input_seed)
 
     return result;
 }
+
+// -------------------- VALIDATE ADDRESS --------------------
+FFI_EXPORT char* ffi_validate_address(const char* input_address)
+{
+    if (!input_address)
+        return nullptr;
+
+    address_info info = validate_address(std::string(input_address));
+
+    // Format:
+    // valid:::type:::network:::spend_key:::view_key:::payment_id
+
+    // If invalid, return minimal response
+    if (!info.valid)
+    {
+        std::string combined = "0:::invalid";
+        char* result = (char*)malloc(combined.size() + 1);
+        std::strcpy(result, combined.c_str());
+        return result;
+    }
+
+    std::string combined;
+
+    combined += "1";
+    combined += ":::" + info.type;
+    combined += ":::" + info.network;
+    combined += ":::" + info.spend_public_key;
+    combined += ":::" + info.view_public_key;
+    combined += ":::" + info.payment_id;
+
+    char* result = (char*)malloc(combined.size() + 1);
+    std::strcpy(result, combined.c_str());
+    return result;
+}
+
 FFI_EXPORT void ffi_free(char* ptr)
 {
     free(ptr);

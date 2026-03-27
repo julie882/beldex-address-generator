@@ -4,6 +4,7 @@
 #include <sstream>
 #include <atomic>
 
+#include "cryptonote_basic.h"
 #include "crypto/crypto.h"
 #include "crypto/hash.h"
 
@@ -47,4 +48,4 @@ using blobdata = std::string;
 std::string get_account_address_as_str(
   const account_public_address& adr);
 
- }
+ };

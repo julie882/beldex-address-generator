@@ -7,6 +7,8 @@
 #include <crypto/crypto.h>
 #include <mnemonics/electrum-words.h>
 #include "cryptonote_basic/cryptonote_basic.h"
+#include "cryptonote_basic/cryptonote_basic_impl.h"
+
 extern "C"
 {
 #include "crypto/keccak.h"
@@ -33,7 +35,7 @@ account_keys generate(const crypto::secret_key& recovery_key, bool recover, bool
     crypto::generate_keys(m_keys.m_account_address.m_view_public_key, m_keys.m_view_secret_key, second, two_random ? false : true);
 
     return m_keys;
-}
+} 
 
 wallet restore_wallet(const std::string& input_seed)
 {
@@ -108,4 +110,57 @@ wallet generate_new_wallet()
 
     return w;               
 
+} 
+
+address_info validate_address(const std::string& address)
+{
+    address_info result{};
+    cryptonote::address_parse_info info;
+
+    cryptonote::network_type nettype = cryptonote::MAINNET;
+    bool valid = false;
+
+    for (cryptonote::network_type nt : {cryptonote::MAINNET, cryptonote::TESTNET, cryptonote::DEVNET})
+    {
+        if (cryptonote::get_account_address_from_str(info, nt, address))
+        {
+            nettype = nt;
+            valid = true;
+            break;
+        }
+    }
+
+    result.valid = valid;
+
+    if (!valid)
+    {
+        result.type = "invalid";
+        return result;
+    }
+
+    // Type
+    if (info.is_subaddress)
+        result.type = "subaddress";
+    else if (info.has_payment_id)
+        result.type = "integrated";
+    else
+        result.type = "standard";
+
+    // Network
+    if (nettype == cryptonote::MAINNET) result.network = "mainnet";
+    else if (nettype == cryptonote::TESTNET) result.network = "testnet";
+    else if (nettype == cryptonote::DEVNET) result.network = "devnet";
+
+    // Keys
+    const auto& addr = info.address;
+    result.spend_public_key = epee::to_hex::string(epee::as_byte_span(addr.m_spend_public_key));
+    result.view_public_key  = epee::to_hex::string(epee::as_byte_span(addr.m_view_public_key));
+
+    // Payment ID (NO string_tools)
+    if (info.has_payment_id)
+    {
+        result.payment_id = epee::to_hex::string(epee::as_byte_span(info.payment_id));
+    }
+
+    return result;
 }
